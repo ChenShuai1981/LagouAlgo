@@ -32,9 +32,40 @@ public class BasicCalculator {
         System.out.println(number);
     }
 
-    private Number eval(String expression) {
-        char[] chars = expression.toCharArray();
-        Stack<Character> stack = new Stack<>();
-
+    private Number eval(String string) {
+        Stack<Integer> stack = new Stack<>();
+        int number = 0;
+        int result = 0;
+        int sign = 1; // 正负号 (1, -1)
+        for (int i=0; i<string.length(); i++) {
+            char c = string.charAt(i);
+            if (Character.isDigit(c)) {
+                number = number*10 + (int) (c - '0');
+            } else if (c == '+') {
+                result += sign * number;
+                number = 0;
+                sign = 1;
+            } else if (c == '-') {
+                result += sign * number;
+                number = 0;
+                sign = -1;
+            } else if (c == '(') {
+                //we push the result first, then sign;
+                stack.push(result);
+                stack.push(sign);
+                //reset the sign and result for the value in the parenthesis
+                sign = 1;
+                result = 0;
+            } else if (c == ')') {
+                result += sign * number;
+                number = 0;
+                result *= stack.pop();    //stack.pop() is the sign before the parenthesis
+                result += stack.pop();   //stack.pop() now is the result calculated before the parenthesis
+            }
+        }
+        if(number != 0) {
+            result += sign * number;
+        }
+        return result;
     }
 }
